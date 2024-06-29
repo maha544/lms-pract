@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
+import { sendData } from '../../config/firebaseMethods';
 
 const AddClassForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [classes , setClasses] = useState()
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    const addData = ()=>{
+      let obj = {
+        classes : classes,
+      createdAt : JSON.stringify((new Date))
+      }
+      sendData('classes' , obj)
+    }
+
     onClose();
   };
 

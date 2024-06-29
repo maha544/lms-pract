@@ -21,6 +21,7 @@ import AddClassForm from "../screens/class/classForm";
 
 import Login from "../pages/login";
 import Dashboard from "../pages/dashboard";
+import NotFoundScreen from "../pages/notfound";
 
 const AppRouter = () => {
   return (
@@ -28,7 +29,10 @@ const AppRouter = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="dashboard" element={<Dashboard />}>
-          <Route path="admission" element={<Admission />} />
+        <Route path="*" element={<NotFoundScreen />}/>
+          <Route path="admission" element={<Admission onClose={function (): void {
+            throw new Error("Function not implemented.");
+          } } />} />
           <Route path="class/form" element={<AddClassForm onClose={function (): void {
             throw new Error("Function not implemented.");} } />} />
           <Route path="class/list" element={<ClassList />} />
