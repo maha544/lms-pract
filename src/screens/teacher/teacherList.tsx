@@ -1,25 +1,52 @@
-import React, { useState } from 'react';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import React, { useState, useEffect } from 'react';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import { Button, Box } from '@mui/material';
 import AddTeacherForm from './teacherAddEdt';
 import TeacherAllocation from './teacherAllocAdd';
+import { getData, editData } from '../../config/firebaseMethods';
+
+interface Teacher {
+  id: string;
+  name: string;
+  class: string;
+  subject: string;
+  email: string;
+}
 
 const TeacherList: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [showAllocation, setShowAllocation] = useState(false);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [editTeacher, setEditTeacher] = useState<Teacher | null>(null);
 
   const handleAddTeacherClick = () => {
+    setEditTeacher(null);
     setShowForm(true);
   };
 
   const handleCloseForm = () => {
     setShowForm(false);
+    fetchTeachers();
   };
 
   const handleSeeAllocationClick = () => {
     setShowAllocation(true);
   };
+
+  const handleEditTeacherClick = (teacher: Teacher) => {
+    setEditTeacher(teacher);
+    setShowForm(true);
+  };
+
+  const fetchTeachers = async () => {
+    const teacherList: Teacher[] = await getData('teachers');
+    setTeachers(teacherList);
+  };
+
+  useEffect(() => {
+    fetchTeachers();
+  }, []);
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 90 },
@@ -27,22 +54,23 @@ const TeacherList: React.FC = () => {
     { field: 'class', headerName: 'Class', width: 110 },
     { field: 'subject', headerName: 'Subject', width: 110 },
     { field: 'email', headerName: 'Email', width: 200 },
-  ];
-
-  const rows = [
-    { id: 1, name: 'Sead Ahmed', class: '10th', subject: 'English', email: 'ahmed@example.com' },
-    { id: 2, name: 'Samreen Khan', class: '10th', subject: 'Math', email: 'samreen@example.com' },
-    { id: 3, name: 'Laiba Ahmed', class: '9th', subject: 'Science', email: 'laiba@example.com' },
-    { id: 4, name: 'Kashif Mumtaz', class: '7th', subject: 'English', email: 'kashif@example.com' },
-    { id: 5, name: 'Maryum Ayaz', class:'10th', subject: 'Urdu', email: 'maryum@example.com' },
-    { id: 6, name: 'Ali Mughal', class: '8th', subject: 'Islamiat', email: 'ali@example.com' },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      renderCell: (params: GridRenderCellParams) => (
+        <Button variant="contained" color="primary" onClick={() => handleEditTeacherClick(params.row as Teacher)}>
+          Edit
+        </Button>
+      ),
+    },
   ];
 
   return (
     <Box sx={{ padding: 4 }}>
       {!showForm && !showAllocation && (
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography variant="h4" sx={{color: '#006494'}}>Teachers List</Typography>
+          <Typography variant="h4" sx={{ color: '#006494' }}>Teachers List</Typography>
           <Box>
             <Button variant="contained" color="primary" onClick={handleAddTeacherClick} sx={{ mr: 2 }}>
               Add Teacher
@@ -53,12 +81,12 @@ const TeacherList: React.FC = () => {
           </Box>
         </Box>
       )}
-      {showForm && <AddTeacherForm onClose={handleCloseForm} />}
+      {showForm && <AddTeacherForm onClose={handleCloseForm} editTeacher={editTeacher} />}
       {showAllocation && <TeacherAllocation />}
       {!showForm && !showAllocation && (
         <Box sx={{ height: 400, width: '100%' }}>
           <DataGrid
-            rows={rows}
+            rows={teachers}
             columns={columns}
             pageSizeOptions={[5, 10, 15]}
             checkboxSelection

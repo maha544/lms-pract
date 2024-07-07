@@ -1,49 +1,53 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
 
-interface Class {
+type ExamResult = {
   id: string;
-  className: string;
-  teacher: string;
-  numStudents: number;
-  roomNumber: string;
-}
-interface ClassFormProps {
-  initialClass?: Class | null;
-  onClose: () => void;
-  onSave: (classData: Class) => Promise<void>;
-}
+  name: string;
+  subject: string;
+  score: string;
+  grade: string;
+};
 
-const ClassForm: React.FC<ClassFormProps> = ({ initialClass, onClose, onSave }) => {
-  const [classData, setClassData] = useState<Class>({
-    id: initialClass?.id ?? '',
-    className: initialClass?.className ?? '',
-    teacher: initialClass?.teacher ?? '',
-    numStudents: initialClass?.numStudents ?? 0,
-    roomNumber: initialClass?.roomNumber ?? '',
-  });
+type ExamFormProps = {
+  initialExamResult?: ExamResult | null;
+  onClose: () => void;
+  onSave: (exam_res: ExamResult) => Promise<void>;
+};
+
+const ExamResultForm: React.FC<ExamFormProps> = ({
+  initialExamResult,
+  onSave,
+  onClose,
+}) => {
+  const initialExamState: ExamResult = {
+    id: initialExamResult?.id || '',
+    name: initialExamResult?.name || '',
+    subject: initialExamResult?.subject || '',
+    score: initialExamResult?.score || '',
+    grade: initialExamResult?.grade || '',
+  };
+
+  const [examResultState, setExamResultState] = useState<ExamResult>(
+    initialExamState
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setClassData({
-      ...classData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setExamResultState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await onSave(classData);
-      setClassData({
-        id: '',
-        className: '',
-        teacher: '',
-        numStudents: 0,
-        roomNumber: '',
-      });
-      onClose();
+      await onSave(examResultState);
+      setExamResultState(initialExamState); 
+      onClose(); 
     } catch (error) {
-      console.error('Error saving class:', error);
+      console.error('Error saving exam result:', error);
     }
   };
 
@@ -61,62 +65,62 @@ const ClassForm: React.FC<ClassFormProps> = ({ initialClass, onClose, onSave }) 
       }}
     >
       <Typography variant="h4" gutterBottom sx={{ color: '#006494' }}>
-        {initialClass ? 'Edit Class' : 'Add Class'}
+        {initialExamResult ? 'Edit Exam Result' : 'Add Exam Result'}
       </Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: 600 }}>
         <TextField
           label="ID"
           name="id"
-          value={classData.id}
+          value={examResultState.id}
           onChange={handleChange}
           fullWidth
           margin="normal"
           required
-          disabled={!!initialClass}
+          disabled={!!initialExamResult}
         />
         <TextField
-          label="Class Name"
-          name="className"
-          value={classData.className}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-          required
-        />
-        <TextField
-          label="Teacher"
-          name="teacher"
-          value={classData.teacher}
+          label="Student Name"
+          name="name"
+          value={examResultState.name}
           onChange={handleChange}
           fullWidth
           margin="normal"
           required
         />
         <TextField
-          label="Number of Students"
-          name="numStudents"
-          value={classData.numStudents}
+          label="Subject"
+          name="subject"
+          value={examResultState.subject}
           onChange={handleChange}
           fullWidth
           margin="normal"
           required
+        />
+        <TextField
+          label="Score"
+          name="score"
+          value={examResultState.score}
+          onChange={handleChange}
           type="number"
+          fullWidth
+          margin="normal"
+          required
         />
         <TextField
-          label="Room Number"
-          name="roomNumber"
-          value={classData.roomNumber}
+          label="Grade"
+          name="grade"
+          value={examResultState.grade}
           onChange={handleChange}
           fullWidth
           margin="normal"
           required
         />
         <Button type="submit" variant="contained" color="secondary" sx={{ mt: 2 }}>
-          {initialClass ? 'Update Class' : 'Add Class'}
+          {initialExamResult ? 'Update Exam Result' : 'Add Exam Result'}
         </Button>
       </Box>
     </Box>
   );
 };
 
-export default ClassForm;
+export default ExamResultForm;

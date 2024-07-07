@@ -9,7 +9,7 @@ import FeeVoucher from "../screens/fees/feeVoucher";
 import Registration from "../screens/school/registration";
 import StudentList from "../screens/students/stdList";
 import StudentAddEdt from "../screens/students/stdAddEdt";
-import TransferStd from "../screens/students/transferStd";
+import TransferStudentList from "../screens/students/transferStd";
 import SubjectList from "../screens/subject/subList";
 import SubjectAddEdt from "../screens/subject/subAddEdt";
 import SyllabusList from "../screens/syllabus/syllList";
@@ -33,19 +33,25 @@ const AppRouter = () => {
           <Route path="admission" element={<Admission onClose={function (): void {
             throw new Error("Function not implemented.");
           } } />} />
-          <Route path="class/form" element={<AddClassForm onClose={function (): void {
-            throw new Error("Function not implemented.");} } />} />
+          <Route path="class/form" element={<AddClassForm onClose={() => {}} onSave={(classData) => { return Promise.resolve();}}/>}/>
           <Route path="class/list" element={<ClassList />} />
           <Route path="exam/result" element={<ExamResult />} />
           <Route path="exam/schedule" element={<ExamSchedule />} />
           <Route path="fees/structure" element={<FeeStructure />} />
-          <Route path="fees/submission" element={<FeeSubmission />} />
-          <Route path="fees/voucher" element={<FeeVoucher />} />
-          <Route path="school/registration" element={<Registration />} />
+          <Route path="fees/submission" element={<FeeSubmission onClose={function (): void {
+            throw new Error("Function not implemented.");
+          } } onSave={function (editedFee: { feeType: string; amount: number; }): Promise<void> {
+            throw new Error("Function not implemented.");
+          } } initialFee={null} />}/>
+          <Route path="fees/voucher" element={<FeeVoucher onClose={function (): void {
+            throw new Error("Function not implemented.");
+          } } fee={null} />} />
+          <Route path="school/registration" element={<Registration onClose={function (): void {
+            throw new Error("Function not implemented.");
+          } }  />} />
           <Route path="students/list" element={<StudentList />} />
-          <Route path="students/add" element={<StudentAddEdt onClose={function (): void {
-            throw new Error("Function not implemented.");} } />} />
-          <Route path="students/transfer" element={<TransferStd />} />
+          <Route path="students/add" element={<StudentAddEdt onClose={() => { } } onSave={() => { } } selectedStudent={null} />} />
+          <Route path="students/transfer" element={<TransferStudentList students={[]} />} />
           <Route path="subject/list" element={<SubjectList />} />
           <Route path="subject/add" element={<SubjectAddEdt onClose={function (): void {
             throw new Error("Function not implemented.");
@@ -53,11 +59,14 @@ const AppRouter = () => {
             throw new Error("Function not implemented.");
           } } />} />
           <Route path="syllabus/list" element={<SyllabusList />} />
-          <Route path="syllabus/form" element={<SyllabusForm onClose={function (): void {
-            throw new Error("Function not implemented.");} } />} />
+        <Route
+          path="syllabus/form"
+          element={<SyllabusForm onClose={() => {}} onSave={(syllabus) => Promise.resolve()} />}
+        />
           <Route path="teacher/list" element={<TeacherList />} />
           <Route path="teacher/add" element={<TeacherAddEdt onClose={function (): void {
-            throw new Error("Function not implemented.");} } />} />
+            throw new Error("Function not implemented.");
+          } } editTeacher={null} />} />
           <Route path="teacher/allocation" element={<TeacherAllocation />} />
         </Route>
       </Routes>

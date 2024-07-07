@@ -1,13 +1,27 @@
-import { Button, Container, CssBaseline, TextField, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import React, { useState } from 'react';
+import { Box, Button, Container, CssBaseline, Snackbar, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { sendData } from '../config/firebaseMethods';
 
 const Login = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  const handleSubmit = (event: { preventDefault: () => void; }) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    navigate('/dashboard')
+    try {
+      await sendData('users', { username, password });
+      setOpenSnackbar(true);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error sending data:', error);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -26,13 +40,14 @@ const Login = () => {
           }}
         >
           <Typography 
-          sx={{margin:1,
+            sx={{
+              margin: 1,
               color: '#006494',
               fontFamily: 'Roboto, sans-serif',
               fontWeight: 700,
-          }} 
-          component="h1" 
-          variant="h4">
+            }} 
+            component="h1" 
+            variant="h4">
             EduWave
           </Typography>
           <Typography component="h1" variant="h5">
@@ -47,6 +62,8 @@ const Login = () => {
               label="Username"
               name="username"
               autoFocus
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
             <TextField
               margin="normal"
@@ -56,6 +73,8 @@ const Login = () => {
               label="Password"
               type="password"
               id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <Button
               type="submit"
@@ -68,6 +87,22 @@ const Login = () => {
           </Box>
         </Box>
       </Container>
+
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        open={openSnackbar}
+        autoHideDuration={6000} 
+        onClose={handleCloseSnackbar}
+        message="You have successfully signed in to EduWave"
+        action={
+          <Button color="secondary" size="small" onClick={handleCloseSnackbar}>
+            Close
+          </Button>
+        }
+      />
     </Box>
   );
 };

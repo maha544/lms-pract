@@ -1,24 +1,39 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
 
+interface Subject {
+  id: string;
+  class: string;
+  subject: string;
+}
 interface SubjectAddProps {
   onClose: () => void;
-  onSubmit: (subject: { class: string; subject: string }) => void;
+  onSubmit: (subject: Subject) => void;
+  initialSubject?: Subject | null;
 }
 
-const SubjectAddForm: React.FC<SubjectAddProps> = ({ onClose, onSubmit }) => {
-  const [subjectClass, setSubjectClass] = useState('');
-  const [subjectName, setSubjectName] = useState('');
+const SubjectAddForm: React.FC<SubjectAddProps> = ({ onClose, onSubmit, initialSubject }) => {
+  const [subjectClass, setSubjectClass] = useState(initialSubject?.class || '');
+  const [subjectName, setSubjectName] = useState(initialSubject?.subject || '');
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    onSubmit({ class: subjectClass, subject: subjectName });
+    const newSubject: Subject= {
+      id: initialSubject?.id || generateNewId(),
+      class: subjectClass,
+      subject: subjectName,
+    };
+    onSubmit(newSubject);
     onClose();
+  };
+
+  const generateNewId = () => {
+    return Math.random().toString(36).substring(2, 15);
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Typography variant="h6" sx={{color: '#006494'}}>Add Subject</Typography>
+      <Typography variant="h6" sx={{ color: '#006494' }}>Add Subject</Typography>
       <TextField
         label="Class"
         value={subjectClass}
